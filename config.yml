@@ -1,0 +1,9 @@
+# copy and paste the dash + first set of brackets to add a new account
+accounts: 
+  - {
+    token: "",
+    cookie: ""
+  }
+
+# In hours
+refreshInterval: 4
