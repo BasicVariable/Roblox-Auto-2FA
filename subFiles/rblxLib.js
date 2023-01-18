@@ -59,6 +59,7 @@ const getCsrfToken = async (cookie) => {
         let token = await response.headers.get("x-csrf-token");
         if (!token) {await reactiveDelay(10_000); continue};
 
+        currentCSRF = token;
         return token
     }
 };
