@@ -1,4 +1,10 @@
 const fs = require("node:fs");
+const readline = require('node:readline/promises');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
 const yaml = require("js-yaml");
 const twofactor = require("node-2fa");
 
@@ -55,12 +61,17 @@ fs.readFile("./config.yml", 'utf-8', async (err, res) => {
             continue
         };
         
-        let accountConfig = await rbxApi.getConfig(account.cookie, accountInfo.id) || [];
-        let authenticatorEnabled = accountConfig.filter(f2aMethod => f2aMethod.mediaType === "Authenticator" && f2aMethod.enabled == true);
+        while (true){
+            let accountConfig = await rbxApi.getConfig(account.cookie, accountInfo.id) || [];
+            let authenticatorEnabled = accountConfig.filter(f2aMethod => f2aMethod.mediaType === "Authenticator" && f2aMethod.enabled == true);
 
-        if (authenticatorEnabled.length < 1){
-            console.log(`Your token isn't attached to this account (${accountInfo.name}):`, account.cookie);
-            continue
+            if (authenticatorEnabled.length < 1){
+                console.log(`Your token isn't attached to this account (${accountInfo.name}):`);
+                await rl.question(`Press enter once you've entered in the code "${newToken}" on the "Authenticator Setup" or do ctrl + c to exit the program`);
+                continue
+            };
+
+            break
         };
 
         accounts.push({
@@ -81,6 +92,17 @@ fs.readFile("./config.yml", 'utf-8', async (err, res) => {
     }, "");
     console.log(`Verified ${accounts2Names}.\nStarting 2fa verifications...`);
 
+    // Readline for status updates (IM NOT USING SWITCH CASES THERE WILL BE NO MORE COMMANDS IM SURE)
+    rl.on('line', async (input) => {
+        if (input.toLowerCase() === "newcodes"){
+            let accountCodes = await accounts.reduce(async (a, current) => {
+                const newCode = await verifyST(account.token);
+                return a+=`\n${current.name}: ${newCode}`
+            }, "New Codes:");
+            console.log(accountCodes);
+        }
+    });
+
     while (true){
         for (account of accounts){
             let verificationProcess = await rbxApi.complete2FA(account, verifyST);
@@ -91,7 +113,9 @@ fs.readFile("./config.yml", 'utf-8', async (err, res) => {
                 continue
             };
 
-            console.log(`${(new Date()).toLocaleString('en-US')} > Refreshed 2fa status for ${account.name} / ${account.id} / ${account.token}`)
+            console.log(`${(new Date()).toLocaleString('en-US')} > Refreshed 2fa status for ${account.name} / ${account.id} / ${account.token}`, 
+                `   > Your 2Step code is ${await verifyST(account.token)}`
+            );
         };
         
         if (accounts.length < 1) {
