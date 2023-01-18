@@ -2,6 +2,16 @@
 
 Simple Auto 2FA for roblox trades.
 
+# Installation
+```
+1. Download all the files in this repository through the code button and by clicking "download zip"
+2. Extract the zip and open the folder the files are in
+  2a. Setup config.yml with your accounts and prefered settings
+3. Open command prompt with the folder that contains all the files as the directory
+4. Type 'npm install' and press enter
+5. Type 'node index.js' and press enter
+```
+
 # Getting 2FA token
 ```
 1. Go to your security settings on Roblox (https://www.roblox.com/my/account#!/security)
@@ -17,11 +27,9 @@ Follow if you didn't finish the "Authenticator Setup" for Roblox by using an aut
 # Documentation 
 
 refreshInterval:
-
 Amount of hours before it completes another 2fa challenge.
 
 accounts:
-
 A list of accounts (as objects) that will have their 2fa challenges completed.
 ```
 accounts: 
