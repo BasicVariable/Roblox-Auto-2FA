@@ -148,7 +148,7 @@ const complete2FA = async (account, getCode) => {
         }).catch(err => console.log(err));
 
         if (!response || response.status!=200) {
-            if (response && response.status == (401 || 403)) currentCSRF = null;
+            if (response && response.status == 403) currentCSRF = null;
             trys++;
             continue
         };
